@@ -1,0 +1,19 @@
+{
+  "comment": "Dark, mossy variant of the earthy palette for dark video backgrounds.",
+  "name": "forest",
+  "font": "sans-serif",
+  "background": "#23231E",
+  "surface": "#2F2E26",
+  "grid": "#3A382F",
+  "text": "#EDE6D6",
+  "muted": "#A39B87",
+  "primary": "#D98E5F",
+  "secondary": "#9DB17C",
+  "accent": "#E3B65B",
+  "hit": "#9DB17C",
+  "miss": "#D9694F",
+  "stroke_width": 4,
+  "title_size": 44,
+  "label_size": 28,
+  "small_size": 22
+}

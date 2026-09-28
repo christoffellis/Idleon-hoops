@@ -67,16 +67,28 @@ The game's exact controls were inferred from the script, so check these first:
   not match `life.png`) when a life is lost.
 - The lives display updates within `settle_time` (0.5 s) of a shot. Raise it if misses are being read as hits.
 
+## Video illustrations
+
+The graphs and maths from the script (Nyquist sampling, the reward curve, the hoop prediction and more) are
+drawn with manim, in a configurable earthy theme. See [`animations/README.md`](animations/README.md).
+
+```bash
+pip install -e ".[animations]"
+python -m animations.render --list
+python -m animations.render nyquist --theme forest
+```
+
 ## Development
 
 ```bash
-pytest                          # detection, tracker, reward, controls and a fake-game environment test
+pytest                          # detection, tracker, reward, controls, themes and a fake-game environment test
 python scripts/nyquist_demo.py  # regenerates assets/nyquist.png for the video
 ```
 
 ## Layout
 
 ```
+animations/       manim illustrations for the video (themes, scenes, render.py)
 src/hoops_bot/
   config.py       settings
   capture.py      screen grabbing

@@ -21,6 +21,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest", "matplotlib"]
+animations = ["manim>=0.18"]
 
 [project.scripts]
 hoops-calibrate = "hoops_bot.calibrate:main"
@@ -32,3 +33,4 @@ where = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["src", "."]
