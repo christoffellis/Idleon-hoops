@@ -12,11 +12,3 @@ class GameController:
         import pyautogui
 
         pyautogui.press(self.cfg.shoot_key)
-
-    def restart(self) -> None:
-        """Click the retry button if one is configured; otherwise the game restarts itself."""
-        if self.cfg.restart_click is None:
-            return
-        import pyautogui
-
-        pyautogui.click(*self.cfg.restart_click)

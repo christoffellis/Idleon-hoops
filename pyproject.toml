@@ -13,6 +13,7 @@ dependencies = [
     "opencv-python",
     "mss",
     "pyautogui",
+    "pynput",
     "gymnasium",
     "stable-baselines3",
     "tensorboard",

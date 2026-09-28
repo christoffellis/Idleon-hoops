@@ -5,13 +5,13 @@ How each section of the video script (`docs/script.md`) lines up with the code.
 | Script section | Where it lives |
 | --- | --- |
 | 1-3 Intro, what is Idleon, game plan | (on camera) |
-| 4 Rules, phase 1 | `HoopsEnv` in `src/hoops_bot/env.py` (wait or shoot, hit detection) |
+| 4 Rules, phase 1 | `HoopsEnv` in `src/hoops_bot/env.py` (wait or shoot, lives-based hit and miss detection) |
 | 5 Breaking down phase 1 (4 inputs to 2) | `src/hoops_bot/observation.py` |
 | 6 PPO and the reward function | `src/hoops_bot/reward.py`, `src/hoops_bot/train.py` |
 | 7 Finding the ball and hoop with OpenCV | `src/hoops_bot/detection.py`, `src/hoops_bot/capture.py`, `hoops-calibrate preview` |
 | 8 Phase 2, moving hoop and Nyquist | `src/hoops_bot/tracker.py`, `scripts/nyquist_demo.py` |
 | 9 Phase 3, moving player | Already handled: `observation.py` measures from the ball's live position |
-| 10 Sign-off numbers (shots and minutes) | `src/hoops_bot/metrics.py`, printed by `hoops-play` |
+| 10 Sign-off numbers (shots and minutes) | `src/hoops_bot/metrics.py`, printed by `hoops-play`; cooldowns and pauses are excluded from the minutes |
 
 ## Notes for the script
 

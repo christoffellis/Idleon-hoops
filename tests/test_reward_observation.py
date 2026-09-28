@@ -17,17 +17,17 @@ def test_closest_approach_without_data_is_infinite():
 
 
 def test_hit_is_rewarded():
-    reward, hit = shot_reward(10.0, Config())
-    assert hit and reward == Config().hit_reward
+    assert shot_reward(True, 500.0, Config()) == Config().hit_reward
 
 
 def test_penalty_grows_with_miss_distance_and_saturates():
     cfg = Config()
-    near, _ = shot_reward(cfg.hit_tolerance_px + 5, cfg)
-    far, _ = shot_reward(cfg.miss_scale_px / 2, cfg)
-    huge, _ = shot_reward(10_000, cfg)
+    near = shot_reward(False, 20.0, cfg)
+    far = shot_reward(False, cfg.miss_scale_px / 2, cfg)
+    huge = shot_reward(False, 10_000, cfg)
+    unseen = shot_reward(False, float("inf"), cfg)
     assert 0 > near > far > huge
-    assert huge == -cfg.miss_penalty
+    assert huge == unseen == -cfg.miss_penalty
 
 
 def test_observation_is_two_relative_values():
