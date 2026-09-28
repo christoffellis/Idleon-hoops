@@ -1,0 +1,12 @@
+__pycache__/
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+
+# Local setup and outputs
+config.json
+models/
+runs/
+*.zip
+captures/
