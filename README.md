@@ -1,4 +1,4 @@
-# idleon-hoops-bot
+# idleon-hoops
 
 Train a PPO agent to beat the hoop-shooting minigame in [Legends of Idleon](https://www.legendsofidleon.com/),
 using OpenCV to read the screen. Companion code for the video (script in [`docs/script.md`](docs/script.md),

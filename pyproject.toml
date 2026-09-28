@@ -3,7 +3,7 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "idleon-hoops-bot"
+name = "idleon-hoops"
 version = "0.1.0"
 description = "Train a PPO agent to beat the Idleon hoops minigame using OpenCV screen detection."
 readme = "README.md"
