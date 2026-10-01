@@ -1,0 +1,19 @@
+{
+  "comment": "Warm paper background, terracotta, olive and ochre accents.",
+  "name": "earthy",
+  "font": "sans-serif",
+  "background": "#F4EFE6",
+  "surface": "#EAE1D0",
+  "grid": "#DDD3C2",
+  "text": "#3B2F2F",
+  "muted": "#8C7B6B",
+  "primary": "#B85C38",
+  "secondary": "#6B7F4F",
+  "accent": "#D9A441",
+  "hit": "#6B7F4F",
+  "miss": "#A8442F",
+  "stroke_width": 4,
+  "title_size": 44,
+  "label_size": 28,
+  "small_size": 22
+}

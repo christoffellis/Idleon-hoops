@@ -13,6 +13,18 @@ How each section of the video script (`docs/script.md`) lines up with the code.
 | 9 Phase 3, moving player | Already handled: `observation.py` measures from the ball's live position |
 | 10 Sign-off numbers (shots and minutes) | `src/hoops_bot/metrics.py`, printed by `hoops-play`; cooldowns and pauses are excluded from the minutes |
 
+## Illustrations
+
+| Script section | Scene (`python -m animations.render <key>`) |
+| --- | --- |
+| 3 The game plan | `plan` |
+| 4 Rules (phases and score thresholds) | `phases` |
+| 5 Four inputs to two | `inputs` |
+| 6 Reward function | `reward` |
+| 7 Finding the ball | `detection` |
+| 8 Nyquist and predicting the hoop | `nyquist`, `prediction` |
+| 9 Moving player | `moving-player` |
+
 ## Notes for the script
 
 - **Nyquist wording.** The theorem says you need a sampling rate of at least *twice* the signal
