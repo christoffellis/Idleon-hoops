@@ -201,3 +201,17 @@ holds the same bar.
 - **Aspect-ratio change.** Handled by the warning and refit above, but it is a real source of silent error if ignored.
 - **Score reading** depends on the font. Fallback: infer the outcome from the contact flag and lives alone.
 - **Window edges are fuzzy** where the rim is touched. Deterministic, but the band is found empirically, not derived.
+
+
+## Status and decisions (supersedes anything above that disagrees)
+
+- **Regression only.** No RL, no surrogate PPO, no gymnasium. The whole model is a few least-squares fits.
+- **Scripts and animations are untouched.**
+- **Hit window learned online** from every shot, not a separate bisection phase (contact hits are free probes).
+- **Latency** is fitted from shots at different player phases; `hoops-fit` reports if it is still uncertain.
+- **Periods**: hoop 4 s; player periods are found by a period scan (fit a sine at each candidate period, keep the best), from `hoops-calibrate motion` or live.
+- **Hoop respawn** box is not needed: each spawn is fitted live, and a jump marks a respawn.
+- **Reference size** is found by `hoops-calibrate scale`.
+- **Play continues** past 40 points; `--stop-at` is optional.
+- **Long-lived branch**: `plan/physics-rewrite` until phase 1 works on the real game.
+- Built and tested against a simulated game (`tests/synthetic_game.py`); real-game assumptions are listed in the PR notes.

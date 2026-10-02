@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "idleon-hoops"
 version = "0.1.0"
-description = "Train a PPO agent to beat the Idleon hoops minigame using OpenCV screen detection."
+description = "Beat the Idleon hoops minigame by fitting its physics from screen detection (OpenCV + regression)."
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
@@ -14,9 +14,6 @@ dependencies = [
     "mss",
     "pyautogui",
     "pynput",
-    "gymnasium",
-    "stable-baselines3",
-    "tensorboard",
 ]
 
 [project.optional-dependencies]
@@ -25,8 +22,9 @@ animations = ["manim>=0.18"]
 
 [project.scripts]
 hoops-calibrate = "hoops_bot.calibrate:main"
-hoops-train = "hoops_bot.train:main"
-hoops-play = "hoops_bot.play:main"
+hoops-record = "hoops_bot.record:main"
+hoops-fit = "hoops_bot.fit:main"
+hoops-aim = "hoops_bot.aim:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
