@@ -49,7 +49,7 @@ def feed(track, model, start, seconds, noise=0.0003, seed=0):
 def test_track_with_known_period_locks_quickly_and_predicts_ahead():
     hoop = SineModel(0.8, 0.05, 0.02, TWO_PI / 4)
     track = SineTrack(period=4.0)
-    now, _ = feed(track, hoop, 500.0, 1.5)
+    now, _ = feed(track, hoop, 500.0, 2.5)  # needs half a cycle: a sliver extrapolates badly
     assert track.ready
     assert abs(float(track.predict(now + 0.5)) - float(hoop(now + 0.5))) < 0.002
 
@@ -59,7 +59,7 @@ def test_track_notices_a_respawn_and_relocks():
     second = SineModel(0.9, 0.05, 0.0, TWO_PI / 4)
     track = SineTrack(period=4.0)
     now, _ = feed(track, first, 100.0, 4.0)
-    now, flagged = feed(track, second, now, 2.0, seed=1)
+    now, flagged = feed(track, second, now, 3.0, seed=1)
     assert any(flagged) and track.resets == 1
     assert track.ready
     assert abs(float(track.predict(now + 0.4)) - float(second(now + 0.4))) < 0.003
@@ -67,7 +67,7 @@ def test_track_notices_a_respawn_and_relocks():
 
 def test_static_hoop_is_a_constant_model():
     track = SineTrack(period=4.0)
-    now, _ = feed(track, SineModel.constant(0.84), 10.0, 2.0)
+    now, _ = feed(track, SineModel.constant(0.84), 10.0, 3.0)
     assert track.ready and track.model.amplitude < 1e-9
     assert float(track.predict(now + 1)) == pytest.approx(0.84, abs=0.001)
 

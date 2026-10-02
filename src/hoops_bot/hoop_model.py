@@ -88,15 +88,18 @@ class SineTrack:
         self,
         period: float | None = None,
         tolerance: float = 0.015,
-        min_span_fraction: float = 0.25,
+        min_span_fraction: float = 0.5,
+        min_constant_span: float = 2.0,
         min_samples: int = 6,
         min_amplitude: float = 0.004,
         period_range: tuple[float, float] = (0.8, 12.0),
         unknown_period_span: float = 6.0,
     ):
         self.period = period
+        self._period_given = period is not None  # a measured period is re-scanned after a reset
         self.tolerance = tolerance
         self.min_span_fraction = min_span_fraction
+        self.min_constant_span = min_constant_span
         self.min_samples = min_samples
         self.min_amplitude = min_amplitude
         self.period_range = period_range
@@ -112,6 +115,8 @@ class SineTrack:
         self._samples.clear()
         self.model, self.rms = None, math.inf
         self._recent_bad = []
+        if not self._period_given:
+            self.period = None
         for sample in keep or []:
             self._samples.append(sample)
 
@@ -143,6 +148,11 @@ class SineTrack:
             return
         t, x = (np.array(col) for col in zip(*self._samples))
         span = float(t[-1] - t[0])
+        # Too little of the cycle seen: even a flat-looking stretch may be the top of a sine, and a fit
+        # to a sliver extrapolates badly. Wait for enough of the cycle first.
+        needed = self.min_span_fraction * self.period if self.period else self.min_constant_span
+        if span < needed:
+            return
         if float(np.ptp(x)) < self.min_amplitude:  # not moving: a constant is the model
             self.model, self.rms = SineModel.constant(float(np.median(x))), float(np.std(x))
             return
@@ -153,8 +163,6 @@ class SineTrack:
                 self.period, _ = scan_period(t, x, *self.period_range)
             except ValueError:
                 return
-        if span < self.min_span_fraction * self.period:
-            return
         self.model, self.rms = fit_sine(t, x, 2 * math.pi / self.period)
 
     # ---- reading -----------------------------------------------------------

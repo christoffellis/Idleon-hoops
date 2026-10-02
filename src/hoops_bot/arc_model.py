@@ -71,7 +71,13 @@ def usable_shot(shot: dict, launch_tol: float = 0.015, contact_tol: float = 0.00
     start = first_departure(t, u, v, pu, pv, shot["t_press"], launch_tol)
     if start is None:
         return None, "ball never left the player"
-    t, u, v = t[start:], u[start:], v[start:]
+    # The player's model may be stale (e.g. it just started moving), so the first "departed" frame can
+    # still be the held ball. Try the next couple of frames as the start and keep the longest clean arc.
+    best = max(
+        range(start, min(start + 3, len(t) - 6)),
+        key=lambda s0: (split_at_contact(t[s0:], u[s0:], v[s0:], contact_tol)[0], -s0),
+    )
+    t, u, v = t[best:], u[best:], v[best:]
     n_clean, _ = split_at_contact(t, u, v, contact_tol)
     if n_clean < 6:
         return None, "too few clean frames before contact"

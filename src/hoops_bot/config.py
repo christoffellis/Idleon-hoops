@@ -41,8 +41,10 @@ class Config:
     shoot_key: str = "space"
     settle_time: float = 0.8         # wait after a shot for score and lives to update
     flight_timeout: float = 2.5
+    respawn_jump: float = 0.15       # ball jump (fraction of height) between frames that means a new ball appeared
     max_wait: float = 20.0           # give up looking for a good release after this long
     probe_step: float = 0.02         # aim offset (fraction of height) between probe shots
+    aim_prior: float = 0.0           # where to start probing: signed miss from the panel centre (+ is lower)
     default_window: float = 0.02     # clean-hit band width assumed until measured
 
     # --- Runs and controls --------------------------------------------------
