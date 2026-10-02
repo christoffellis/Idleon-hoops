@@ -1,4 +1,7 @@
-"""Central configuration. Values can be overridden by a config.json in the repo root."""
+"""Central configuration. Values can be overridden by a config.json in the repo root.
+
+Every spatial setting is a fraction of the monitor or of the game viewport, never a pixel count.
+"""
 from __future__ import annotations
 
 import json
@@ -6,71 +9,82 @@ from dataclasses import asdict, dataclass, fields
 from pathlib import Path
 
 CONFIG_PATH = Path("config.json")
-TUPLE_FIELDS = ("region", "lives_region")
+FRACTION_FIELDS = ("region", "lives_region", "score_region")
 
 
 @dataclass
 class Config:
-    # --- Screen capture -------------------------------------------------
-    # (left, top, width, height) of the Idleon game area. Set with `hoops-calibrate region`.
-    region: tuple[int, int, int, int] = (0, 0, 1280, 720)
+    # --- Screen capture: fractions (left, top, width, height) -------------
+    monitor: int = 1  # mss monitor index (1 = primary)
+    region: tuple[float, float, float, float] = (0.0, 0.0, 1.0, 1.0)  # of the monitor: the game viewport
+    lives_region: tuple[float, float, float, float] | None = None     # of the viewport
+    score_region: tuple[float, float, float, float] | None = None     # of the viewport
 
-    # --- Detection (script section 7) -----------------------------------
+    # --- Detection --------------------------------------------------------
     ball_template: str = "assets/ball.png"
     hoop_template: str = "assets/hoop_panel.png"
+    life_template: str = "assets/life.png"
+    digits_dir: str = "assets/digits"          # 0.png ... 9.png, made by `hoops-calibrate digits`
+    reference_file: str = "assets/reference.json"  # viewport width the crops were taken at
     match_threshold: float = 0.75
-
-    # --- Lives: a lost life is a miss, an unchanged count is a hit -------
-    lives_template: str = "assets/life.png"  # one remaining life (not an empty slot)
     lives_threshold: float = 0.8
-    # (x, y, width, height) of the lives display *inside* the game region; None searches the whole
-    # region. Set with `hoops-calibrate lives`.
-    lives_region: tuple[int, int, int, int] | None = None
+    score_threshold: float = 0.7
     max_lives: int = 3
 
-    # --- Hoop motion model (script section 8) ---------------------------
-    hoop_period: float = 4.0        # seconds per horizontal cycle
-    sample_interval: float = 0.25   # 4 Hz sampling = 16x the 0.25 Hz hoop frequency
-    flight_time: float = 0.5        # seconds from shot to arrival; measure and tune this
-    fit_tolerance_px: float = 12.0  # RMS error above which the sine fit is distrusted
+    # --- Motion (periods in seconds; None = measure it) -------------------
+    hoop_period: float = 4.0
+    player_v_period: float | None = None
+    player_u_period: float | None = None
+    track_tolerance: float = 0.015   # normalised error that counts as "the hoop respawned"
 
-    # --- Observation scaling (script section 5) -------------------------
-    norm_x: float = 400.0
-    norm_y: float = 300.0
-
-    # --- Environment / reward (script section 6) ------------------------
-    step_interval: float = 0.05     # agent decision rate (much faster than the hoop sample rate)
-    max_waits_per_shot: int = 60    # truncate the episode if the agent never shoots
-    flight_timeout: float = 3.0
-    settle_time: float = 0.5        # pause after a shot so the lives display can update
-    hit_reward: float = 1.0
-    miss_penalty: float = 1.0       # scaled by how far the miss was
-    miss_scale_px: float = 300.0    # miss distance at which the penalty saturates
-    wait_penalty: float = 0.01      # stops the agent from stalling forever
-
-    # --- Input ----------------------------------------------------------
+    # --- Shots ------------------------------------------------------------
     shoot_key: str = "space"
+    settle_time: float = 0.8         # wait after a shot for score and lives to update
+    flight_timeout: float = 2.5
+    max_wait: float = 20.0           # give up looking for a good release after this long
+    probe_step: float = 0.02         # aim offset (fraction of height) between probe shots
+    default_window: float = 0.02     # clean-hit band width assumed until measured
 
-    # --- Runs and controls ----------------------------------------------
-    target_score: int = 40          # score needed for the trophy
-    countdown: int = 5              # seconds to focus the game window before starting
-    pause_hotkey: str = "<f8>"      # toggle pause / resume (pynput key syntax)
-    stop_hotkey: str = "<f9>"       # save and stop
-    snapshot_every_games: int = 5   # keep a numbered model copy every N games
+    # --- Runs and controls --------------------------------------------------
+    trophy_score: int = 40           # reported when reached; play continues unless --stop-at is given
+    countdown: int = 5
+    pause_hotkey: str = "<f8>"
+    stop_hotkey: str = "<f9>"
+    shots_file: str = "runs/shots.jsonl"
+    physics_file: str = "models/physics.json"
+
+    # --- Used only by the video illustrations (animations/) ---------------
+    sample_interval: float = 0.25
+    flight_time: float = 0.5
+    fit_tolerance_px: float = 12.0
+    miss_penalty: float = 1.0
+    miss_scale_px: float = 300.0
+    hit_reward: float = 1.0
 
     @classmethod
     def load(cls, path: str | Path = CONFIG_PATH) -> "Config":
         cfg = cls()
         p = Path(path)
-        if p.exists():
-            known = {f.name for f in fields(cls)}
-            for key, value in json.loads(p.read_text()).items():
-                if key not in known:
+        if not p.exists():
+            return cfg
+        known = {f.name for f in fields(cls)}
+        for key, value in json.loads(p.read_text()).items():
+            if key not in known:
+                continue
+            if key in FRACTION_FIELDS and value is not None:
+                value = tuple(value)
+                if any(part > 1.5 for part in value):
+                    print(f"config.json: ignoring {key}={value}, it looks like pixels. Re-run `hoops-calibrate`.")
                     continue
-                if key in TUPLE_FIELDS and value is not None:
-                    value = tuple(value)
-                setattr(cfg, key, value)
+            setattr(cfg, key, value)
         return cfg
 
     def save(self, path: str | Path = CONFIG_PATH) -> None:
         Path(path).write_text(json.dumps(asdict(self), indent=2))
+
+    def reference_width(self) -> float | None:
+        """Viewport width the template crops were taken at (see `hoops-calibrate scale`)."""
+        p = Path(self.reference_file)
+        if not p.exists():
+            return None
+        return json.loads(p.read_text()).get("reference_width")
